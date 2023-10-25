@@ -1,6 +1,14 @@
-### Hi there 👋
+### Hi, I'm Andrei Bors 👋
 
-I am Andrei Bors, a to become developer who decided to create this GitHub profile with the thought of sharing the code part of the work from my Gymnasiearbete.
-# Gymnasiearbete---Public-Game
-This repository is going to host the files and all you need to download in order to play and rate the game shared by me.
-## Gymnasiearbete; Arena Academy; Natek21; Projekt 2023-2024.
+- 🎓 Student
+- 🌱 Learning Python, soon to explore Java and JavaScript
+- 💻 Passion for Software and Game Development
+
+🚀 **Current Project:**
+- 🏫 **School:** Arena Academy
+- 📚 **Class:** Technic Information 2021
+- 🧮 **Subject:** Programming/Math
+- 📂 **Project:** [Gymnasiearbete]
+  
+🎮 **About the Project:**
+This repository is dedicated to storing and sharing game files for feedback. If you need help with downloading and running the games, there's likely a tutorial to guide you. Feedback can be shared privately. 

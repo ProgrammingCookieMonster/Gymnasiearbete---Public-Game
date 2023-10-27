@@ -6,9 +6,11 @@ from colors import Colors
 pygame.init()
 
 title_font = pygame.font.Font(None, 40)
+info_font = pygame.font.Font(None, 30)
 score_surface = title_font.render("Score", True, Colors.white)
 next_surface = title_font.render("Next", True, Colors.white)
 game_over_surface = title_font.render("GAME OVER", True, Colors.white)
+game_info_surface = info_font.render("By Andrei Bors", True, Colors.white)
 
 score_rect = pygame.Rect(320, 55, 170, 60)
 next_rect = pygame.Rect(320, 215, 170, 180)
@@ -53,6 +55,8 @@ while True:
     screen.blit(next_surface, (375, 180, 50, 50))
     if game.game_over == True:
         screen.blit(game_over_surface, (320, 450, 50, 50))
+    else:
+        screen.blit(game_info_surface, (330, 450, 50, 50))
 
     pygame.draw.rect(screen, Colors.light_blue, score_rect, 0, 10)
     screen.blit(score_value_surface, score_value_surface.get_rect(centerx = score_rect.centerx, centery = score_rect.centery))

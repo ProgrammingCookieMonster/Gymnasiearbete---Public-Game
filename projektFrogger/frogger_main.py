@@ -55,6 +55,11 @@ class Player(Sprite):
     def update(self):
         self.x += self.dx
 
+        #Border checking frog --> frog off the screen = player loose 1 life
+        if self.x < -360 or self.x > 360:
+            self.x = 0
+            self.y = -300
+
 #Class for Car --> Player objective: Avoid the Car
 class Car(Sprite):
     def __init__(self, x, y, width, height, image, dx): #Dx stands for Delta x, changing the direction
@@ -77,21 +82,22 @@ class Log(Sprite):
         self.x += self.dx
 
         #Space Checking - borders
-        if self.x < -400:
-            self.x = 400
-        if self.x > 400:
-            self.x = -400
+        if self.x < -500:
+            self.x = 500
+        if self.x > 500:
+            self.x = -500
 
 
 #Objects
 player = Player(0, -300, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
-player.render(pen)
 
 car_left = Car(300, -255, 121, 40, "graphics/cars/car1_left.gif", -2.5)
 car_right = Car(-300, -200, 121, 40, "graphics/cars/car1_right.gif", +2.5)
-log_left = Log(-300, -150, 121, 40, "graphics/logs/log_full.gif", -1.5)
-log_right = Log(-300, -100, 121, 40, "graphics/logs/log_full.gif", +1.5)
+log_left = Log(-300, -150, 100, 40, "graphics/logs/log_full.gif", -1.5)
+log_right = Log(-300, -100, 100, 40, "graphics/logs/log_full.gif", +1.5)
 
+#List of Objects
+sprites = [car_left, car_right, log_left, log_right, player] # Creating a list to minimize the further code
 
 # Keyboard binding --> controlls
 wn.listen()
@@ -101,38 +107,31 @@ wn.onkeypress(player.right, "Right")
 wn.onkeypress(player.left, "Left")
 
 while True:
-    #Render
-    car_left.render(pen)
-    car_right.render(pen)
-    log_left.render(pen)
-    log_right.render(pen)
-    player.render(pen)
+    #Render, Update, Collisions
+    for sprite in sprites:
+        sprite.render(pen) #Render objects
+        sprite.update() #Update objects
 
-    #Update objects
-    player.update()
-    car_left.update()
-    car_right.update()
-    log_left.update()
-    log_right.update()
-
-    #Check for collisions
-    #Cars
-    if player.is_collision(car_left):
-        player.x = 0
-        player.y = -300
-    if player.is_collision(car_right):
-        player.x = 0
-        player.y = -300
+    player.dx = 0
+    for sprite in sprites:
+        if player.is_collision(sprite):
+            if isinstance(sprite, Car): #Collisions with cars
+                player.x = 0
+                player.y = -300
+                break
+            elif isinstance(sprite, Log):
+                player.dx = sprite.dx
+                break
 
     #Logs
-    if player.is_collision((log_left)):
+    if player.is_collision(log_left):
         player.dx = log_left.dx
     else:
         player.dx = 0
-    if player.is_collision((log_right)):
+
+    if player.is_collision(log_right):
         player.dx = log_right.dx
-    else:
-        player.dx = 0
+    
 
     #Update Screen
     wn.update()

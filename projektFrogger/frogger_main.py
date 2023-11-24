@@ -12,10 +12,9 @@ wn.bgcolor("black")
 wn.tracer(0)
 
 #Shapes registration
-wn.register_shape("graphics/sprite_individuals/frog_frontv1.gif")
-wn.register_shape("graphics/cars/car1_left.gif")
-wn.register_shape("graphics/cars/car1_right.gif")
-wn.register_shape("graphics/logs/log_full.gif")
+shapes = ["graphics/sprite_individuals/frog_frontv1.gif", "graphics/cars/car1_left.gif", "graphics/cars/car1_right.gif", "graphics/logs/log_full.gif", "graphics/others/turtles_left.gif", "graphics/others/turtles_right.gif"]
+for shape in shapes:
+    wn.register_shape(shape)
 
 pen = turtle.Turtle()
 pen.speed(0)
@@ -87,6 +86,19 @@ class Log(Sprite):
         if self.x > 500:
             self.x = -500
 
+class Turtles(Sprite):
+    def __init__(self, x, y, width, height, image, dx): #Dx stands for Delta x, changing the direction
+        Sprite.__init__(self, x, y, width, height, image)
+        self.dx = dx
+    def update(self):
+        self.x += self.dx
+
+        #Space Checking - borders
+        if self.x < -500:
+            self.x = 500
+        if self.x > 500:
+            self.x = -500
+
 
 #Objects
 player = Player(0, -300, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
@@ -95,9 +107,11 @@ car_left = Car(300, -255, 121, 40, "graphics/cars/car1_left.gif", -2.5)
 car_right = Car(-300, -200, 121, 40, "graphics/cars/car1_right.gif", +2.5)
 log_left = Log(-300, -150, 100, 40, "graphics/logs/log_full.gif", -1.5)
 log_right = Log(-300, -100, 100, 40, "graphics/logs/log_full.gif", +1.5)
+turtle_left = Log(-300, -50, 160, 32, "graphics/others/turtles_left.gif", -1.5)
+turtle_right = Log(-300, 0, 160, 32, "graphics/others/turtles_right.gif", +1.5)
 
 #List of Objects
-sprites = [car_left, car_right, log_left, log_right, player] # Creating a list to minimize the further code
+sprites = [car_left, car_right, log_left, log_right, turtle_right, turtle_left, player] # Creating a list to minimize the further code
 
 # Keyboard binding --> controlls
 wn.listen()

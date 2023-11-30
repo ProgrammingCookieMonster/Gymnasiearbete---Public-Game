@@ -1,5 +1,5 @@
-#Frogger; OG-game; Main page for the game with the little frog, trying to cross the road.
-
+# Frogger; OG-game; Main page for the game with the little frog, trying to cross the road.
+import time
 import turtle
 import math
 
@@ -12,7 +12,7 @@ wn.bgcolor("black")
 wn.tracer(0)
 
 #Shapes registration
-shapes = ["graphics/sprite_individuals/frog_frontv1.gif", "graphics/cars/car1_left.gif", "graphics/cars/car1_right.gif", "graphics/logs/log_full.gif", "graphics/others/turtles_left.gif", "graphics/others/turtles_right.gif"]
+shapes = ["graphics/sprite_individuals/frog_frontv1.gif", "graphics/cars/car1_left.gif", "graphics/cars/car1_right.gif", "graphics/logs/log_full.gif", "graphics/others/turtles_left.gif", "graphics/others/turtles_right.gif", "graphics/others/turtles_right_half.gif", "graphics/others/turtles_left_half.gif", "graphics/others/turtles_left_submerged.gif", "graphics/others/turtles_right_submerged.gif"]
 for shape in shapes:
     wn.register_shape(shape)
 
@@ -21,7 +21,7 @@ pen.speed(0)
 pen.hideturtle()
 
 #Classes
-class Sprite(): #sprite = character
+class Sprite(): # sprite = character
     def __init__(self, x, y, width, height, image):
         self.x = x
         self.y = y
@@ -86,10 +86,15 @@ class Log(Sprite):
         if self.x > 500:
             self.x = -500
 
-class Turtles(Sprite):
+class Turtle(Sprite):
     def __init__(self, x, y, width, height, image, dx): #Dx stands for Delta x, changing the direction
         Sprite.__init__(self, x, y, width, height, image)
         self.dx = dx
+        self.state = "full" # half, submerged --> full and half can hold the player but a submerged turtle won't --> player gets reseted and looses a life
+        self.full_time = 10
+        self.half_time = 5
+        self.submerged_time = 5
+        self.start_time = time.time()
     def update(self):
         self.x += self.dx
 
@@ -99,6 +104,34 @@ class Turtles(Sprite):
         if self.x > 500:
             self.x = -500
 
+        #Update image based on state:
+        if self.state == "full":
+            if self.dx > 0:
+                self.image = "graphics/others/turtles_right.gif"
+            else:
+                self.image = "graphics/others/turtles_left.gif"
+        elif self.state == "half":
+            if self.dx > 0:
+                self.image = "graphics/others/turtles_right_half.gif"
+            else:
+                self.image = "graphics/others/turtles_left_half.gif"
+        elif self.state == "submerged":
+            if self.dx > 0:
+                self.image = "graphics/others/turtles_right_submerged.gif"
+            else:
+                self.image = "graphics/others/turtles_left_submerged.gif"
+
+        #Game Timer - turtle state
+        if self.state == "full" and time.time() - self.start_time > self.full_time:
+            self.state = "half"
+            self.start_time = time.time()
+        elif self.state == "half" and time.time() - self.start_time > self.half_time:
+            self.state = "submerged"
+            self.start_time = time.time()
+        elif self.state == "submerged" and time.time() - self.start_time > self.submerged_time:
+            self.state = "full"
+            self.start_time = time.time()
+
 
 #Objects
 player = Player(0, -300, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
@@ -107,8 +140,8 @@ car_left = Car(300, -255, 121, 40, "graphics/cars/car1_left.gif", -2.5)
 car_right = Car(-300, -200, 121, 40, "graphics/cars/car1_right.gif", +2.5)
 log_left = Log(-300, -150, 100, 40, "graphics/logs/log_full.gif", -1.5)
 log_right = Log(-300, -100, 100, 40, "graphics/logs/log_full.gif", +1.5)
-turtle_left = Log(-300, -50, 160, 32, "graphics/others/turtles_left.gif", -1.5)
-turtle_right = Log(-300, 0, 160, 32, "graphics/others/turtles_right.gif", +1.5)
+turtle_left = Turtle(-300, -50, 100, 32, "graphics/others/turtles_left.gif", -1.0)
+turtle_right = Turtle(-300, 0, 100, 32, "graphics/others/turtles_right.gif", +1.0)
 
 #List of Objects
 sprites = [car_left, car_right, log_left, log_right, turtle_right, turtle_left, player] # Creating a list to minimize the further code
@@ -129,28 +162,20 @@ while True:
     player.dx = 0
     for sprite in sprites:
         if player.is_collision(sprite):
-            if isinstance(sprite, Car): #Collisions with cars
+            if isinstance(sprite, Car): #Collisions with cars --> Frog dies
                 player.x = 0
                 player.y = -300
                 break
-            elif isinstance(sprite, Log):
+            elif isinstance(sprite, Log): #Collisions with log --> Frog floats
+                player.dx = sprite.dx
+                break
+            elif isinstance(sprite, Turtle) and sprite.state != "submerged": #Collision with turtles --> Frog floats only on full and half state
                 player.dx = sprite.dx
                 break
 
-    #Logs
-    if player.is_collision(log_left):
-        player.dx = log_left.dx
-    else:
-        player.dx = 0
-
-    if player.is_collision(log_right):
-        player.dx = log_right.dx
-    
 
     #Update Screen
     wn.update()
 
     #Clearing Pen
     pen.clear()
-
-wn.mainloop()

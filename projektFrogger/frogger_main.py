@@ -12,7 +12,15 @@ wn.bgcolor("black")
 wn.tracer(0)
 
 #Shapes registration
-shapes = ["graphics/sprite_individuals/frog_frontv1.gif", "graphics/cars/car1_left.gif", "graphics/cars/car1_right.gif", "graphics/logs/log_full.gif", "graphics/others/turtles_left.gif", "graphics/others/turtles_right.gif", "graphics/others/turtles_right_half.gif", "graphics/others/turtles_left_half.gif", "graphics/others/turtles_left_submerged.gif", "graphics/others/turtles_right_submerged.gif"]
+shapes = [
+        "graphics/sprite_individuals/frog_frontv1.gif", "graphics/cars/car1_left.gif",
+        "graphics/cars/car1_right.gif", "graphics/logs/log_full.gif", "graphics/others/turtles_left.gif",
+        "graphics/others/turtles_right.gif", "graphics/others/turtles_right_half.gif",
+        "graphics/others/turtles_left_half.gif", "graphics/others/turtles_left_submerged.gif",
+        "graphics/others/turtles_right_submerged.gif", "graphics/cars/racing_car1_left.gif",
+        "graphics/cars/racing_car2_left.gif", "graphics/cars/police_car_left.gif",
+        "graphics/cars/truck_right.gif", "graphics/cars/truck_left.gif", "graphics/others/croc_killer.gif"
+        ]
 for shape in shapes:
     wn.register_shape(shape)
 
@@ -68,10 +76,10 @@ class Car(Sprite):
         self.x += self.dx
 
         #Space Checking - borders
-        if self.x < -400:
-            self.x = 400
-        if self.x > 400:
-            self.x = -400
+        if self.x < -550:
+            self.x = 550
+        if self.x > 550:
+            self.x = -550
 
 class Log(Sprite):
     def __init__(self, x, y, width, height, image, dx): #Dx stands for Delta x, changing the direction
@@ -85,6 +93,15 @@ class Log(Sprite):
             self.x = 500
         if self.x > 500:
             self.x = -500
+
+class Crocodile(Sprite):
+    def __init__(self, x, y, width, height, image, dx): #Dx stands for Delta x, changing the direction
+        Sprite.__init__(self, x, y, width, height, image)
+        self.dx = dx
+    def update(self):
+        self.x += self.dx
+
+
 
 class Turtle(Sprite):
     def __init__(self, x, y, width, height, image, dx): #Dx stands for Delta x, changing the direction
@@ -133,18 +150,29 @@ class Turtle(Sprite):
             self.start_time = time.time()
 
 
-#Objects
+#Objects --> Objects won't be in row others as there is a certain variation of positions; creating game pattern
 player = Player(0, -300, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
-
-car_left = Car(300, -255, 121, 40, "graphics/cars/car1_left.gif", -2.5)
-car_right = Car(-300, -200, 121, 40, "graphics/cars/car1_right.gif", +2.5)
-log_left = Log(-300, -150, 100, 40, "graphics/logs/log_full.gif", -1.5)
-log_right = Log(-300, -100, 100, 40, "graphics/logs/log_full.gif", +1.5)
-turtle_left = Turtle(-300, -50, 100, 32, "graphics/others/turtles_left.gif", -1.0)
-turtle_right = Turtle(-300, 0, 100, 32, "graphics/others/turtles_right.gif", +1.0)
+# CARS
+car_left = Car(300, -250, 121, 40, "graphics/cars/car1_left.gif", -2.5) # Row 1
+car_right = Car(-300, -100, 121, 40, "graphics/cars/car1_right.gif", +2.5) # Row 4
+racing_car1 = Car(-300, -150, 121, 40, "graphics/cars/racing_car1_left.gif", -4.0) # Row 3
+racing_car2 = Car(-450, -150, 121, 40, "graphics/cars/racing_car2_left.gif", -4.0) # Row 3 --> Racing cars and police car are racing
+racing_car3 = Car(-540, -150, 121, 40, "graphics/cars/police_car_left.gif", -3.0) # Row 3
+truck_left = Car(300, -50, 200, 40, "graphics/cars/truck_left.gif", -2.5) # Row 5
+truck_right = Car(300, -200, 200, 40, "graphics/cars/truck_right.gif", +2.5) # Row 2
+# LOGS
+log_left = Log(-300, 50, 100, 40, "graphics/logs/log_full.gif", -2.5) # Row 6
+log_right = Log(-300, 150, 100, 40, "graphics/logs/log_full.gif", +2.5) #
+# TURTLES
+turtle_left = Turtle(-300, 100, 200, 32, "graphics/others/turtles_left.gif", -1.0) # Row 7
+turtle_right = Turtle(-300, 200, 250, 32, "graphics/others/turtles_right.gif", +1.0)
+killer = Crocodile(400, 100, 100, 40, "graphics/others/croc_killer.gif", -1.0)
 
 #List of Objects
-sprites = [car_left, car_right, log_left, log_right, turtle_right, turtle_left, player] # Creating a list to minimize the further code
+sprites = [
+        car_left, car_right, log_left, log_right,
+        turtle_right, turtle_left, racing_car1, racing_car2, racing_car3, truck_right, truck_left, killer, player
+        ] # Creating a list to minimize the further code
 
 # Keyboard binding --> controlls
 wn.listen()
@@ -166,6 +194,9 @@ while True:
                 player.x = 0
                 player.y = -300
                 break
+            elif isinstance(sprite, Crocodile):
+                player.x = 0
+                player.y = -300
             elif isinstance(sprite, Log): #Collisions with log --> Frog floats
                 player.dx = sprite.dx
                 break

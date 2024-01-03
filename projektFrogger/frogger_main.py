@@ -3,6 +3,7 @@ import time
 import turtle
 import math
 import random
+import pygame
 
 #Set up the screen
 wn = turtle.Screen()
@@ -12,6 +13,12 @@ wn.cv._rootwindow.resizable(False, False)
 wn.bgcolor("green")
 wn.bgpic("graphics/others/frogger_background.gif")
 wn.tracer(0)
+
+#Set up game time (FPS)
+pygame.init()
+clock = pygame.time.Clock()
+FPS = 60
+dt = clock.tick(FPS) / 100.0 #delta time
 
 #Shapes registration
 shapes = [
@@ -79,7 +86,7 @@ class Player(Sprite):
 class Car(Sprite):
     def __init__(self, x, y, width, height, image, dx): #Dx stands for Delta x, changing the direction
         Sprite.__init__(self, x, y, width, height, image)
-        self.dx = dx
+        self.dx = dx * dt
     def update(self):
         self.x += self.dx
 
@@ -92,7 +99,7 @@ class Car(Sprite):
 class Log(Sprite):
     def __init__(self, x, y, width, height, image, dx): #Dx stands for Delta x, changing the direction
         Sprite.__init__(self, x, y, width, height, image)
-        self.dx = dx
+        self.dx = dx * dt
     def update(self):
         self.x += self.dx
 
@@ -105,7 +112,7 @@ class Log(Sprite):
 class Turtle(Sprite):
     def __init__(self, x, y, width, height, image, dx): #Dx stands for Delta x, changing the direction
         Sprite.__init__(self, x, y, width, height, image)
-        self.dx = dx
+        self.dx = dx * dt
         self.state = "full" # half, submerged --> full and half can hold the player but a submerged turtle won't --> player gets reseted and looses a life
         self.full_time = random.randint(8, 12)
         self.half_time = random.randint(6, 8)

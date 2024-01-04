@@ -29,7 +29,7 @@ shapes = [
         "graphics/others/turtles_right_submerged.gif", "graphics/cars/racing_car1_left.gif",
         "graphics/cars/racing_car2_left.gif", "graphics/cars/police_car_left.gif", "graphics/cars/racing_car1_right.gif",
         "graphics/cars/truck_right.gif", "graphics/cars/truck_left.gif", "graphics/others/croc_killer.gif",
-        "graphics/others/goal.gif", "graphics/others/frog_is_home.gif"
+        "graphics/others/goal.gif", "graphics/others/frog_is_home.gif", "graphics/others/heart_full.gif", "graphics/others/heart_empty.gif"
         ]
 for shape in shapes:
     wn.register_shape(shape)
@@ -65,6 +65,11 @@ class Player(Sprite):
         Sprite.__init__(self, x, y, width, height, image)
         self.dx = 0
         self.collision = False
+        self.frogs_home = 0
+        self.max_time = 60
+        self.time_remaining = 60
+        self.start_time = time.time()
+        self.lives = 3
     def up(self):
         self.y += 50
     def down(self):
@@ -76,11 +81,28 @@ class Player(Sprite):
 
     def update(self):
         self.x += self.dx
-
         #Border checking frog --> frog off the screen = player loose 1 life
         if self.x < -360 or self.x > 360:
-            self.x = 0
-            self.y = -350
+            self.go_home()
+            self.lives -= 1
+        elif self.y <  -400:
+            self.go_home()
+            self.lives -= 1
+
+        self.time_remaining = self.max_time - round(time.time() - self.start_time)
+
+        #Time's up
+        if self.time_remaining <= 0:
+            player.lives -= 1
+            self.go_home()
+
+    def go_home(self):
+        self.dx = 0
+        self.y = -350
+        self.x = 0
+        self.max_time = 60
+        self.time_remaining = 60
+        self.start_time = time.time()
 
 #Class for Car --> Player objective: Avoid the Car
 class Car(Sprite):
@@ -160,10 +182,33 @@ class Home(Sprite):
         Sprite.__init__(self, x, y, width, height, image)
         self.dx = 0
 
+class Timer():
+    def __init__(self, max_time):
+        self.x = 285
+        self.y = 340
+        self.max_time = max_time
+        self.width = 200
+        self.text_x = 150
+
+    def render(self, time, pen):
+        pen.color("red")
+        pen.pensize(10)
+        pen.penup()
+        pen.goto(self.x, self.y)
+        pen.pendown()
+        percent = time/self.max_time
+        dx = percent * self.width
+        pen.goto(self.x - dx, self.y)
+        pen.penup()
+
+        text_position = ( self.text_x, self.y + 5)
+        pen.goto(text_position)
+        pen.write(f"Time: {time}", align="left", font=("Times", 24, "bold"))
+        pen.penup()
 
 #Objects --> Objects won't be in row others as there is a certain variation of positions; creating game pattern
 player = Player(0, -350, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
-
+timer = Timer(60)
 # Objects
 level_1 = [
     Car(300, -300, 121, 40, "graphics/cars/car1_left.gif", -3.0),
@@ -207,18 +252,26 @@ wn.onkeypress(player.right, "Right")
 wn.onkeypress(player.left, "Left")
 
 while True:
-    #Render, Update, Collisions
+    # Render, Update, Collisions
     for sprite in sprites:
         sprite.render(pen) #Render objects
         sprite.update() #Update objects
+    # Render timer
+    timer.render(player.time_remaining, pen)
+
+    # Render lives
+    pen.shape("graphics/others/heart_full.gif")
+    for life in range(player.lives):
+        pen.goto(-260 + (life * 65), 350)
+        pen.stamp()
 
     player.dx = 0 # Checking for collisions
     player.collision = False
     for sprite in sprites:
         if player.is_collision(sprite):
             if isinstance(sprite, Car): #Collisions with cars --> Frog dies
-                player.x = 0
-                player.y = -350
+                player.go_home()
+                player.lives -= 1
                 break
             elif isinstance(sprite, Log): #Collisions with log --> Frog floats
                 player.dx = sprite.dx
@@ -229,17 +282,28 @@ while True:
                 player.collision = True
                 # No Break - so collision with crocodile works - test
             elif isinstance(sprite, Home):
-                player.x = 0
-                player.y = -350
+                player.go_home()
                 sprite.image = "graphics/others/frog_is_home.gif"
+                player.frogs_home += 1
                 break
         # Check the player is/isn't touching the water (y > 0 - above the safe line)
-    if player.y > 0 and player.collision != True: # ADD SOUND OF WHATER SPLASH WHEN PLAYER DIES
-        player.x = 0
-        player.y = -350
-    elif isinstance(sprites, Car):
-        player.x = 0
-        player.y = -350
+    if player.y > 0 and player.collision != True: # ADD SOUND OF WHATER SPLASH WHEN PLAYER FALLS IN THE RIVER !!!
+        player.go_home()
+        player.lives -= 1
+
+    # Made it home 5 times (wins 1 level):
+    if player.frogs_home == 5:
+        player.go_home()
+        player.frogs_home = 0
+        for home in homes:
+            home.image = "graphics/others/goal.gif"
+    # Player runs out of lives
+    if player.lives == 0:
+        player.go_home()
+        player.frogs_home = 0
+        for home in homes:
+            home.image = "graphics/others/goal.gif"
+        player.lives = 3
 
     #Update Screen
     wn.update()

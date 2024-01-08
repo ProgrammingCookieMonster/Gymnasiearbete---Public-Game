@@ -215,17 +215,18 @@ class Timer():
 
 class game_score():
     def __init__(self, score):
-        self.x = 0
-        self.y = 0
+        self.x = -150
+        self.y = -380
         self.score = score
 
     def render(self, pen):
         pen.color("green")
         pen.pensize(10)
-        pen.pendown()
-        pen.goto(self.x, self.y)
-        pen.write(f"Score: {score}", align="right", front=("Times", 24, "bold"))
         pen.penup()
+        pen.goto(self.x, self.y)
+        pen.pendown()
+        pen.write(f"Score: {self.score}", align="right", font=("Times", 24, "bold"))
+
 
 #Objects --> Objects won't be in row others as there is a certain variation of positions; creating game pattern
 player = Player(0, -350, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
@@ -287,7 +288,8 @@ while True:
         pen.stamp()
 
     # Render score
-    game_score.render(score, pen)
+    game_score_instance = game_score(score)
+    game_score_instance.render(pen)
 
     player.dx = 0 # Checking for collisions
     player.collision = False
@@ -309,6 +311,7 @@ while True:
                 player.go_home()
                 sprite.image = "graphics/others/frog_is_home.gif"
                 player.frogs_home += 1
+                touch_home = True
                 break
         # Check the player is/isn't touching the water (y > 0 - above the safe line)
     if player.y > 0 and player.collision != True: # ADD SOUND OF WHATER SPLASH WHEN PLAYER FALLS IN THE RIVER !!!
@@ -324,11 +327,13 @@ while True:
         for home in homes:
             home.image = "graphics/others/goal.gif"
     # Calculating score
-    for action in range(1, 5):
-        if action == player.frogs_home:
-            score = score + (50 * score_variable) # giving off points for every frog in the house
-        elif action == player.frogs_home:
-            score = score + (50 * (2 * score_variable)) # giving even more extra points for completing levels
+    min_house = 1
+    max_house = 5
+    touch_home = False
+    if min_house <= player.frogs_home < max_house and touch_home == True:
+        score = score + (50 * score_variable)  # giving off points for every frog in the house
+    elif player.frogs_home == max_house and touch_home == True:
+        score = score + (50 * (2 * score_variable))  # giving even more extra points for completing levels
     # Player runs out of lives
     if player.lives == 0:
         player.go_home()
@@ -343,6 +348,7 @@ while True:
 
     #Update Screen
     wn.update()
+    clock.tick(60)
 
     #Clearing Pen
     pen.clear()

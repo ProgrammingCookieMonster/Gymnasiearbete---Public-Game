@@ -18,7 +18,14 @@ wn.tracer(0)
 pygame.init()
 clock = pygame.time.Clock()
 FPS = 60
-dt = clock.tick(FPS) / 100.0 #delta time
+# dt = clock.tick(FPS) / 100.0 #delta time
+dt = 1
+# Start level value
+game_level = 1
+# Score; higher on higher value; start values
+score_variable = 1
+speed = 1
+score = 0
 
 #Shapes registration
 shapes = [
@@ -201,9 +208,23 @@ class Timer():
         pen.goto(self.x - dx, self.y)
         pen.penup()
 
-        text_position = ( self.text_x, self.y + 5)
-        pen.goto(text_position)
+        timer_position = ( self.text_x, self.y + 5)
+        pen.goto(timer_position)
         pen.write(f"Time: {time}", align="left", font=("Times", 24, "bold"))
+        pen.penup()
+
+class game_score():
+    def __init__(self, score):
+        self.x = 0
+        self.y = 0
+        self.score = score
+
+    def render(self, pen):
+        pen.color("green")
+        pen.pensize(10)
+        pen.pendown()
+        pen.goto(self.x, self.y)
+        pen.write(f"Score: {score}", align="right", front=("Times", 24, "bold"))
         pen.penup()
 
 #Objects --> Objects won't be in row others as there is a certain variation of positions; creating game pattern
@@ -265,6 +286,9 @@ while True:
         pen.goto(-260 + (life * 65), 350)
         pen.stamp()
 
+    # Render score
+    game_score.render(score, pen)
+
     player.dx = 0 # Checking for collisions
     player.collision = False
     for sprite in sprites:
@@ -294,16 +318,28 @@ while True:
     # Made it home 5 times (wins 1 level):
     if player.frogs_home == 5:
         player.go_home()
+        game_level += 1
+        score_variable = score_variable * (game_level/2)
         player.frogs_home = 0
         for home in homes:
             home.image = "graphics/others/goal.gif"
+    # Calculating score
+    for action in range(1, 5):
+        if action == player.frogs_home:
+            score = score + (50 * score_variable) # giving off points for every frog in the house
+        elif action == player.frogs_home:
+            score = score + (50 * (2 * score_variable)) # giving even more extra points for completing levels
     # Player runs out of lives
     if player.lives == 0:
         player.go_home()
+        game_level = 1
+        score_variable = 1
+        speed = 1
         player.frogs_home = 0
         for home in homes:
             home.image = "graphics/others/goal.gif"
         player.lives = 3
+
 
     #Update Screen
     wn.update()

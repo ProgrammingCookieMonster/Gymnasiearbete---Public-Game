@@ -216,30 +216,32 @@ class Timer():
 
 class game_score():
     def __init__(self, score):
-        self.x = -150
+        self.x = -260
         self.y = -380
         self.score = score
 
     def render(self, pen):
-        pen.color("red")
+        pen.color("white")
         pen.pensize(0)
         pen.penup()
         pen.goto(self.x, self.y)
         pen.pendown()
-        pen.write(f"Score: {self.score}", align="right", font=("Times", 32, "bold"))
+        pen.write(f"Score: {self.score}", align="left", font=("Times", 32, "bold"))
+        pen.penup()
 
 class level():
     def __init__(self, game_level):
-        self.x = 150
+        self.x = 220
         self.y = -380
         self.level = game_level
 
     def render(self, pen):
-        pen.color("red")
+        pen.color("white")
         pen.penup()
         pen.goto(self.x, self.y)
         pen.pendown()
-        pen.write(f"Leve")
+        pen.write(f" {self.level}", align="left", font=("Times", 32, "bold"))
+        pen.penup()
 
 #Objects --> Objects won't be in row others as there is a certain variation of positions; creating game pattern
 player = Player(0, -350, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
@@ -305,7 +307,8 @@ while True:
     game_score_instance.render(pen)
 
     # Render level count
-    current_level = game_level
+    current_level = level(game_level)
+    current_level.render(pen)
 
 
     player.dx = 0 # Checking for collisions
@@ -358,6 +361,7 @@ while True:
         game_level = 1
         score_variable = 1
         speed = 1
+        score = 0
         player.frogs_home = 0
         for home in homes:
             home.image = "graphics/others/goal.gif"

@@ -12,7 +12,7 @@ wn.setup(600, 800) # width x height
 wn.cv._rootwindow.resizable(False, False)
 wn.bgcolor("green")
 wn.bgpic("graphics/others/frogger_background.gif")
-wn.tracer(0)
+wn.tracer(0, 0)
 
 #Set up game time (FPS)
 pygame.init()
@@ -26,6 +26,7 @@ game_level = 1
 score_variable = 1
 speed = 1
 score = 0
+touch_home = False
 
 #Shapes registration
 shapes = [
@@ -220,13 +221,25 @@ class game_score():
         self.score = score
 
     def render(self, pen):
-        pen.color("green")
-        pen.pensize(10)
+        pen.color("red")
+        pen.pensize(0)
         pen.penup()
         pen.goto(self.x, self.y)
         pen.pendown()
-        pen.write(f"Score: {self.score}", align="right", font=("Times", 24, "bold"))
+        pen.write(f"Score: {self.score}", align="right", font=("Times", 32, "bold"))
 
+class level():
+    def __init__(self, game_level):
+        self.x = 150
+        self.y = -380
+        self.level = game_level
+
+    def render(self, pen):
+        pen.color("red")
+        pen.penup()
+        pen.goto(self.x, self.y)
+        pen.pendown()
+        pen.write(f"Leve")
 
 #Objects --> Objects won't be in row others as there is a certain variation of positions; creating game pattern
 player = Player(0, -350, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
@@ -291,6 +304,10 @@ while True:
     game_score_instance = game_score(score)
     game_score_instance.render(pen)
 
+    # Render level count
+    current_level = game_level
+
+
     player.dx = 0 # Checking for collisions
     player.collision = False
     for sprite in sprites:
@@ -308,11 +325,13 @@ while True:
                 player.collision = True
                 # No Break - so collision with crocodile works - test
             elif isinstance(sprite, Home):
+                touch_home = True
                 player.go_home()
                 sprite.image = "graphics/others/frog_is_home.gif"
                 player.frogs_home += 1
-                touch_home = True
                 break
+            elif not isinstance(sprite, Home):
+                touch_home = False
         # Check the player is/isn't touching the water (y > 0 - above the safe line)
     if player.y > 0 and player.collision != True: # ADD SOUND OF WHATER SPLASH WHEN PLAYER FALLS IN THE RIVER !!!
         player.go_home()
@@ -322,18 +341,17 @@ while True:
     if player.frogs_home == 5:
         player.go_home()
         game_level += 1
-        score_variable = score_variable * (game_level/2)
+        score_variable = score_variable * game_level
         player.frogs_home = 0
         for home in homes:
             home.image = "graphics/others/goal.gif"
     # Calculating score
     min_house = 1
     max_house = 5
-    touch_home = False
     if min_house <= player.frogs_home < max_house and touch_home == True:
         score = score + (50 * score_variable)  # giving off points for every frog in the house
     elif player.frogs_home == max_house and touch_home == True:
-        score = score + (50 * (2 * score_variable))  # giving even more extra points for completing levels
+        score = score + (100 * score_variable)  # giving even more extra points for completing levels
     # Player runs out of lives
     if player.lives == 0:
         player.go_home()

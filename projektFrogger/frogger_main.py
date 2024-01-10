@@ -18,20 +18,22 @@ wn.tracer(0, 0)
 pygame.init()
 clock = pygame.time.Clock()
 FPS = 60
-# dt = clock.tick(FPS) / 100.0 #delta time
 dt = 1
 # Start level value
 game_level = 1
 # Score; higher on higher value; start values
 score_variable = 1
-speed = 1
 score = 0
+# Speed: Starts from 1,gaining level results into higher speed
+speed = 1
+# Touch Home --> condition for points-gain
 touch_home = False
 
 #Shapes registration
 shapes = [
         "graphics/sprite_individuals/frog_frontv1.gif", "graphics/cars/car1_left.gif",
-        "graphics/cars/car1_right.gif", "graphics/logs/log_full.gif", "graphics/others/turtles_left.gif",
+        "graphics/cars/car1_right.gif", "graphics/logs/log_full_left.gif", "graphics/logs/log_full_right.gif",
+        "graphics/logs/log_half_left.gif", "graphics/logs/log_half_right.gif", "graphics/others/turtles_left.gif",
         "graphics/others/turtles_right.gif", "graphics/others/turtles_right_half.gif",
         "graphics/others/turtles_left_half.gif", "graphics/others/turtles_left_submerged.gif",
         "graphics/others/turtles_right_submerged.gif", "graphics/cars/racing_car1_left.gif",
@@ -78,6 +80,7 @@ class Player(Sprite):
         self.time_remaining = 60
         self.start_time = time.time()
         self.lives = 3
+    # Movement + sprite animation
     def up(self):
         self.y += 50
     def down(self):
@@ -221,7 +224,7 @@ class game_score():
         self.score = score
 
     def render(self, pen):
-        pen.color("white")
+        pen.color("black")
         pen.pensize(0)
         pen.penup()
         pen.goto(self.x, self.y)
@@ -236,7 +239,7 @@ class level():
         self.level = game_level
 
     def render(self, pen):
-        pen.color("white")
+        pen.color("black")
         pen.penup()
         pen.goto(self.x, self.y)
         pen.pendown()
@@ -246,28 +249,36 @@ class level():
 #Objects --> Objects won't be in row others as there is a certain variation of positions; creating game pattern
 player = Player(0, -350, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
 timer = Timer(60)
-# Objects
-level_1 = [
-    Car(300, -300, 121, 40, "graphics/cars/car1_left.gif", -3.0),
-    Car(100, -300, 121, 40, "graphics/cars/car1_left.gif", -3.0),
-    Car(-300, -150, 121, 40, "graphics/cars/car1_right.gif", +2.5),
-    Car(50, -150, 200, 40, "graphics/cars/racing_car1_right.gif", +2.5),
-    Car(-300, -200, 121, 40, "graphics/cars/racing_car1_left.gif", -4.0),
-    Car(-450, -200, 121, 40, "graphics/cars/racing_car2_left.gif", -4.0),
-    Car(-540, -200, 121, 40, "graphics/cars/police_car_left.gif", -3.0),
-    Car(300, -100, 200, 40, "graphics/cars/truck_left.gif", -2.5),
-    Car(500, -100, 121, 40, "graphics/cars/racing_car2_left.gif", -2.5),
-    Car(300, -250, 200, 40, "graphics/cars/truck_right.gif", +2.5),
-    Log(-300, 50, 100, 40, "graphics/logs/log_full.gif", +2.45),
-    Log(-300, 150, 100, 40, "graphics/logs/log_full.gif", +1.75),
-    Log(-300, 250, 100, 40, "graphics/logs/log_full.gif", +3.0),
-    Turtle(-300, 100, 200, 32, "graphics/others/turtles_left.gif", -1.8),
-    Log(100, 100, 100, 40, "graphics/logs/log_full.gif", -1.8),
-    Turtle(-300, 200, 250, 32, "graphics/others/turtles_right.gif", -1.2),
-    Turtle(200, 200, 250, 32, "graphics/others/turtles_right.gif", -1.2),
-    Car(400, 0, 100, 40, "graphics/others/croc_killer.gif", +1.9) #Crocodile, might delete
-]
+# Objects --> Noting row 1 from the first car and last at homes
+objects = [
+    Car(300, -300, 121, 40, "graphics/cars/car1_left.gif", -3.0 * speed), # row 1
+    Car(-150, -300, 121, 40, "graphics/cars/car1_left.gif", -3.0 * speed), # row 1
+    Car(-150, -250, 121, 40, "graphics/cars/car1_right.gif", +2.5 * speed), # row 2
+    Car(300, -250, 200, 40, "graphics/cars/truck_right.gif", +2.5 * speed), # row 2
+    Car(-300, -200, 121, 40, "graphics/cars/racing_car1_left.gif", -4.0 * speed), # row 3
+    Car(-450, -200, 121, 40, "graphics/cars/racing_car2_left.gif", -4.0 * speed), # row 3
+    Car(-540, -200, 121, 40, "graphics/cars/police_car_left.gif", -3.0 * speed), # row 3
+    Car(-300, -150, 121, 40, "graphics/cars/car1_right.gif", +2.5 * speed), # row 4
+    Car(50, -150, 200, 40, "graphics/cars/racing_car1_right.gif", +2.5 * speed), # row 4
+    Car(300, -100, 200, 40, "graphics/cars/truck_left.gif", -2.5 * speed), # row 5
+    Car(500, -100, 121, 40, "graphics/cars/racing_car2_left.gif", -2.5 * speed), # row 5
+    # row 6 is empty -- safe spot
+    Car(400, 0, 100, 40, "graphics/others/croc_killer.gif", +1.9 * speed), # Crocodile inherits car properties -- row 7
+    Log(-300, 50, 100, 40, "graphics/logs/log_full_right.gif", +2.45 * speed), # row 8
+    Log(150, 50, 70, 40, "graphics/logs/log_half_right.gif", +2.45 * speed), # row 8
+    Turtle(-300, 100, 100, 32, "graphics/others/turtles_left.gif", -1.8 * speed), # row 9
+    Log(100, 100, 100, 40, "graphics/logs/log_full_left.gif", -1.8 * speed), # row 9
+    Log(400, 100, 100, 40, "graphics/logs/log_half_left.gif", -1.8 * speed), # row 9
+    Log(-300, 150, 100, 40, "graphics/logs/log_full_right.gif", +1.75 * speed), # row 10
+    Turtle(0, 150, 100, 32, "graphics/others/turtles_left.gif", +1.75 * speed), # row 10
+    Turtle(-300, 200, 100, 32, "graphics/others/turtles_right.gif", -1.2 * speed), # row 11
+    Turtle(200, 200, 100, 32, "graphics/others/turtles_right.gif", -1.2 * speed), # row 11
+    Log(50, 250, 70, 40, "graphics/logs/log_half_right.gif", +3.0 * speed), # row 12
+    Log(-300, 250, 100, 40, "graphics/logs/log_full_right.gif", +3.0 * speed), # row 12 --> row 13 are the houses
 
+
+]
+# Row 13
 homes = [
     Home(0, 300, 50, 50, "graphics/others/goal.gif"),
     Home(-100, 300, 50, 50, "graphics/others/goal.gif"),
@@ -278,7 +289,7 @@ homes = [
 
 
 #List of Objects
-sprites = level_1 + homes
+sprites = objects + homes
 sprites.append(player)
 
 # Keyboard binding --> controlls
@@ -336,9 +347,31 @@ while True:
             elif not isinstance(sprite, Home):
                 touch_home = False
         # Check the player is/isn't touching the water (y > 0 - above the safe line)
-    if player.y > 0 and player.collision != True: # ADD SOUND OF WHATER SPLASH WHEN PLAYER FALLS IN THE RIVER !!!
+    '''if player.y > 0 and player.collision != True: # ADD SOUND OF WHATER SPLASH WHEN PLAYER FALLS IN THE RIVER !!!
         player.go_home()
         player.lives -= 1
+    '''
+    # Calculating score
+    min_house = 1
+    max_house = 5
+    if min_house <= player.frogs_home < max_house and touch_home == True:
+        score = score + (50 * score_variable)  # giving off points for every frog in the house
+    elif player.frogs_home == 5 and touch_home == True:
+        score = score + (100 * score_variable)  # giving even more extra points for completing levels
+
+    # Speed gain
+    def speed_up():
+        increase = 1
+        global speed
+        global game_level
+        if player.frogs_home == 5 and touch_home == True:
+            speed = round((speed + increase * (game_level / 1.5) * 0.75))
+        else:
+            speed = speed
+        return speed
+    speed_up()
+    print(speed)
+
 
     # Made it home 5 times (wins 1 level):
     if player.frogs_home == 5:
@@ -348,13 +381,7 @@ while True:
         player.frogs_home = 0
         for home in homes:
             home.image = "graphics/others/goal.gif"
-    # Calculating score
-    min_house = 1
-    max_house = 5
-    if min_house <= player.frogs_home < max_house and touch_home == True:
-        score = score + (50 * score_variable)  # giving off points for every frog in the house
-    elif player.frogs_home == max_house and touch_home == True:
-        score = score + (100 * score_variable)  # giving even more extra points for completing levels
+
     # Player runs out of lives
     if player.lives == 0:
         player.go_home()

@@ -25,7 +25,8 @@ game_level = 1
 score_variable = 1
 score = 0
 # Speed: Starts from 1,gaining level results into higher speed
-speed = 1
+speed_variable = 1
+speed = (speed_variable * (game_level / 1.5) * 0.75)
 # Touch Home --> condition for points-gain
 touch_home = False
 
@@ -246,6 +247,7 @@ class level():
         pen.write(f" {self.level}", align="left", font=("Times", 32, "bold"))
         pen.penup()
 
+
 #Objects --> Objects won't be in row others as there is a certain variation of positions; creating game pattern
 player = Player(0, -350, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
 timer = Timer(60)
@@ -321,7 +323,6 @@ while True:
     current_level = level(game_level)
     current_level.render(pen)
 
-
     player.dx = 0 # Checking for collisions
     player.collision = False
     for sprite in sprites:
@@ -359,20 +360,6 @@ while True:
     elif player.frogs_home == 5 and touch_home == True:
         score = score + (100 * score_variable)  # giving even more extra points for completing levels
 
-    # Speed gain
-    def speed_up():
-        increase = 1
-        global speed
-        global game_level
-        if player.frogs_home == 5 and touch_home == True:
-            speed = round((speed + increase * (game_level / 1.5) * 0.75))
-        else:
-            speed = speed
-        return speed
-    speed_up()
-    print(speed)
-
-
     # Made it home 5 times (wins 1 level):
     if player.frogs_home == 5:
         player.go_home()
@@ -381,7 +368,6 @@ while True:
         player.frogs_home = 0
         for home in homes:
             home.image = "graphics/others/goal.gif"
-
     # Player runs out of lives
     if player.lives == 0:
         player.go_home()

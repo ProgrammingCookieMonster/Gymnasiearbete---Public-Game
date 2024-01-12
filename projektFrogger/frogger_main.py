@@ -30,6 +30,11 @@ speed = (speed_variable * (game_level / 1.5) * 0.75)
 # Touch Home --> condition for points-gain
 touch_home = False
 
+# Set up music/sounds
+pygame.mixer.music.load("sounds/frogger_background.mp3")
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play(-1)
+
 #Shapes registration
 shapes = [
         "graphics/sprite_individuals/frog_frontv1.gif", "graphics/cars/car1_left.gif",
@@ -379,6 +384,10 @@ while True:
         for home in homes:
             home.image = "graphics/others/goal.gif"
         player.lives = 3
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load("sounds/frogger_background.mp3")
+        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.play(-1)
 
 
     #Update Screen

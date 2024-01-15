@@ -25,7 +25,7 @@ game_level = 1
 score_variable = 1
 score = 0
 # Speed: Starts from 1,gaining level results into higher speed
-speed_variable = 1
+speed_variable = 2
 speed = (speed_variable * (game_level / 1.5) * 0.75)
 # Touch Home --> condition for points-gain
 touch_home = False
@@ -35,9 +35,18 @@ pygame.mixer.music.load("sounds/frogger_background.mp3")
 pygame.mixer.music.set_volume(0.3)
 pygame.mixer.music.play(-1)
 
+sound_falls_river = pygame.mixer.Sound("sounds/water_splash.wav")
+sound_frog_dies = pygame.mixer.Sound("sounds/frog_ribbit.wav")
+sound_key_movement = pygame.mixer.Sound("sounds/move.wav")
+sound_key_movement.set_volume(0.10)
+sound_house_clear = pygame.mixer.Sound("sounds/house_clear.wav")
+sound_level_clear = pygame.mixer.Sound("sounds/level_clear.wav")
+
 #Shapes registration
 shapes = [
-        "graphics/sprite_individuals/frog_frontv1.gif", "graphics/cars/car1_left.gif",
+        "graphics/sprite_individuals/frog_frontv1.gif", "graphics/sprite_individuals/frog_behind.gif",
+        "graphics/sprite_individuals/frog_side1.gif", "graphics/sprite_individuals/frog_side2.gif",
+        "graphics/cars/car1_left.gif",
         "graphics/cars/car1_right.gif", "graphics/logs/log_full_left.gif", "graphics/logs/log_full_right.gif",
         "graphics/logs/log_half_left.gif", "graphics/logs/log_half_right.gif", "graphics/others/turtles_left.gif",
         "graphics/others/turtles_right.gif", "graphics/others/turtles_right_half.gif",
@@ -86,24 +95,34 @@ class Player(Sprite):
         self.time_remaining = 60
         self.start_time = time.time()
         self.lives = 3
-    # Movement + sprite animation
+    # Movement + sprite animation/sound effects
     def up(self):
         self.y += 50
+        self.image = "graphics/sprite_individuals/frog_behind.gif"
+        sound_key_movement.play()
     def down(self):
         self.y -= 50
+        self.image = "graphics/sprite_individuals/frog_frontv1.gif"
+        sound_key_movement.play()
     def right(self):
         self.x += 50
+        self.image = "graphics/sprite_individuals/frog_side1.gif"
+        sound_key_movement.play()
     def left(self):
         self.x -= 50
+        self.image = "graphics/sprite_individuals/frog_side2.gif"
+        sound_key_movement.play()
 
     def update(self):
         self.x += self.dx
         #Border checking frog --> frog off the screen = player loose 1 life
         if self.x < -360 or self.x > 360:
             self.go_home()
+            sound_frog_dies.play()
             self.lives -= 1
         elif self.y <  -400:
             self.go_home()
+            sound_frog_dies.play()
             self.lives -= 1
 
         self.time_remaining = self.max_time - round(time.time() - self.start_time)
@@ -117,6 +136,7 @@ class Player(Sprite):
         self.dx = 0
         self.y = -350
         self.x = 0
+        self.image = "graphics/sprite_individuals/frog_frontv1.gif"
         self.max_time = 60
         self.time_remaining = 60
         self.start_time = time.time()
@@ -333,6 +353,7 @@ while True:
     for sprite in sprites:
         if player.is_collision(sprite):
             if isinstance(sprite, Car): #Collisions with cars --> Frog dies
+                sound_frog_dies.play()
                 player.go_home()
                 player.lives -= 1
                 break
@@ -345,6 +366,7 @@ while True:
                 player.collision = True
                 # No Break - so collision with crocodile works - test
             elif isinstance(sprite, Home):
+                sound_house_clear.play()
                 touch_home = True
                 player.go_home()
                 sprite.image = "graphics/others/frog_is_home.gif"
@@ -353,10 +375,11 @@ while True:
             elif not isinstance(sprite, Home):
                 touch_home = False
         # Check the player is/isn't touching the water (y > 0 - above the safe line)
-    '''if player.y > 0 and player.collision != True: # ADD SOUND OF WHATER SPLASH WHEN PLAYER FALLS IN THE RIVER !!!
+    if player.y > 0 and player.collision != True: # ADD SOUND OF WHATER SPLASH WHEN PLAYER FALLS IN THE RIVER !!!
         player.go_home()
+        sound_falls_river.play()
         player.lives -= 1
-    '''
+
     # Calculating score
     min_house = 1
     max_house = 5
@@ -367,6 +390,7 @@ while True:
 
     # Made it home 5 times (wins 1 level):
     if player.frogs_home == 5:
+        sound_level_clear.play()
         player.go_home()
         game_level += 1
         score_variable = score_variable * game_level

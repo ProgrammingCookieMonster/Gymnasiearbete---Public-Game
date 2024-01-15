@@ -32,7 +32,7 @@ touch_home = False
 
 # Set up music/sounds
 pygame.mixer.music.load("sounds/frogger_background.mp3")
-pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.set_volume(0.08)
 pygame.mixer.music.play(-1)
 
 sound_falls_river = pygame.mixer.Sound("sounds/water_splash.wav")

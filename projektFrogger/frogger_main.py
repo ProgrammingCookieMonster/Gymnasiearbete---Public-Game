@@ -25,14 +25,13 @@ game_level = 1
 score_variable = 1
 score = 0
 # Speed: Starts from 1,gaining level results into higher speed
-speed_variable = 2
-speed = (speed_variable * (game_level / 1.5) * 0.75)
+speed = 1.5
 # Touch Home --> condition for points-gain
 touch_home = False
 
 # Set up music/sounds
 pygame.mixer.music.load("sounds/frogger_background.mp3")
-pygame.mixer.music.set_volume(0.08)
+pygame.mixer.music.set_volume(0.1)
 pygame.mixer.music.play(-1)
 
 sound_falls_river = pygame.mixer.Sound("sounds/water_splash.wav")
@@ -163,10 +162,10 @@ class Log(Sprite):
         self.x += self.dx
 
         #Space Checking - borders
-        if self.x < -550:
-            self.x = 550
-        if self.x > 550:
-            self.x = -550
+        if self.x < -500:
+            self.x = 500
+        if self.x > 500:
+            self.x = -500
 
 class Turtle(Sprite):
     def __init__(self, x, y, width, height, image, dx): #Dx stands for Delta x, changing the direction
@@ -272,7 +271,6 @@ class level():
         pen.write(f" {self.level}", align="left", font=("Times", 32, "bold"))
         pen.penup()
 
-
 #Objects --> Objects won't be in row others as there is a certain variation of positions; creating game pattern
 player = Player(0, -350, 40, 40, "graphics/sprite_individuals/frog_frontv1.gif")
 timer = Timer(60)
@@ -313,7 +311,6 @@ homes = [
     Home(100, 300, 50, 50, "graphics/others/goal.gif"),
     Home(200, 300, 50, 50, "graphics/others/goal.gif")
 ]
-
 
 #List of Objects
 sprites = objects + homes
@@ -393,10 +390,10 @@ while True:
         sound_level_clear.play()
         player.go_home()
         game_level += 1
-        score_variable = score_variable * game_level
         player.frogs_home = 0
         for home in homes:
             home.image = "graphics/others/goal.gif"
+
     # Player runs out of lives
     if player.lives == 0:
         player.go_home()
@@ -410,7 +407,7 @@ while True:
         player.lives = 3
         pygame.mixer.music.stop()
         pygame.mixer.music.load("sounds/frogger_background.mp3")
-        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.set_volume(0.1)
         pygame.mixer.music.play(-1)
 
 

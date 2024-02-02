@@ -22,4 +22,3 @@ def import_folder(path):
             img_surf = pygame.image.load(full_path).convert_alpha()
             surface_list.append(img_surf)
     return surface_list
-import_folder('../graphics/Grass')

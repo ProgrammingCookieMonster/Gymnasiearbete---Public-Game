@@ -24,7 +24,7 @@ class Game:
 
             self.screen.fill('black')
             self.level.run()
-            # debug('This called function is going to check some stuff later')
+            #  debug('This called function is going to check some stuff later')
             pygame.display.update()
             self.clock.tick(FPS)
 

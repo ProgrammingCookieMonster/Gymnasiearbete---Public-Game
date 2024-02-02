@@ -3,6 +3,8 @@ from settings import *
 from tile import Tile
 from player import PLayer
 from support import *
+from random import choice
+from weapon import Weapon
 from debug import debug
 
 class Level:
@@ -15,14 +17,22 @@ class Level:
         self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = pygame.sprite.Group()
 
+        # attack sprites
+        self.current_attack = None
+
         # sprite setup
         self.create_map()
     def create_map(self):
         layouts = {
-            'boundary': import_csv_layout('../map/map_FloorBlocks.csv')
-            'grass': import_csv_layout('../map/map_Grass.csv')
+            'boundary': import_csv_layout('../map/map_FloorBlocks.csv'),
+            'grass': import_csv_layout('../map/map_Grass.csv'),
             'object': import_csv_layout('../map/map_Objects.csv')
         }
+        graphics = {
+            'grass': import_folder('../graphics/grass'),
+            'objects': import_folder('../graphics/objects')
+        }
+
         for style, layout in layouts.items():
             for row_index, row in enumerate(layout):
                 for col_index, col in enumerate(row):
@@ -32,23 +42,27 @@ class Level:
                         if style == 'boundary':
                             Tile((x,y), [self.obstacle_sprites], 'invisible')
                         if style == 'grass':
-                            # create grass tile
-                            pass
+                            random_grass_image = choice(graphics['grass'])
+                            Tile((x,y), [self.visible_sprites, self.obstacle_sprites], 'grass', random_grass_image)
                         if style == 'object':
-                            # create object tile
-                            pass
-        '''
-                if col == 'x':
-                    Tile((x, y), [self.visible_sprites, self.obstacle_sprites])
-                if col == 'p':
-                    self.player = PLayer((x, y), [self.visible_sprites], self.obstacle_sprites)
-        '''
-        self.player = PLayer((1600, 1470), [self.visible_sprites], self.obstacle_sprites)
+                            surf = graphics['objects'][int(col)]
+                            Tile((x, y), [self.visible_sprites, self.obstacle_sprites], 'object', surf)
+
+        self.player = PLayer((1600, 1470), [self.visible_sprites], self.obstacle_sprites, self.create_attack, self.destroy_attack)
+
+    def create_attack(self):
+        self.current_attack = Weapon(self.player, [self.visible_sprites])
+
+    def destroy_attack(self):
+        if self.current_attack:
+            self.current_attack.kill()
+        self.current_attack = None
 
     def run(self):
         # update and draw the game
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
+        debug(self.player.status)
 
 
 class YSortCameraGroup(pygame.sprite.Group):

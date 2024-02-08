@@ -11,6 +11,13 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.level = Level()
+
+        # sounds
+        main_sound = pygame.mixer.Sound('../audio/main.ogg')
+        main_sound.set_volume(0.5)
+        main_sound.play(loops = - 1)
+
+        # outside look
         pygame.display.set_caption("Runeblade Rhapsody")  # Setting custom window name
         game_icon = pygame.image.load("../graphics/runeblade_test_icon.png")  # Setting custom icon to the game window
         pygame.display.set_icon(game_icon)
@@ -25,7 +32,7 @@ class Game:
                     if event.key == pygame.K_m:
                         self.level.toggle_menu()
 
-            self.screen.fill('black')
+            self.screen.fill(WATER_COLOR)
             self.level.run()
             #  debug('This called function is going to check some stuff later')
             pygame.display.update()

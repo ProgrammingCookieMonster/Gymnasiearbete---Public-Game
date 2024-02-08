@@ -8,7 +8,7 @@ class PLayer(Entity):
         super().__init__(groups)
         self.image = pygame.image.load("../graphics/player_test.png").convert_alpha()
         self.rect = self.image.get_rect(topleft = pos)
-        self.hitbox = self.rect.inflate(0, -30)
+        self.hitbox = self.rect.inflate(-6, HITBOX_OFFSET['player'])
 
         # graphic setup
         self.import_player_assets()
@@ -42,13 +42,17 @@ class PLayer(Entity):
         self.upgrade_cost = {'health': 100, 'energy': 100, 'attack': 100, 'magic': 100, 'speed': 100}
         self.health = self.stats['health']
         self.energy = self.stats['energy']
-        self.exp = 500
+        self.exp = 5000
         self.speed = self.stats['speed']
 
         # damage timer
         self.vulnerable = True
         self.hurt_time = None
         self.invulnerability_duration = 500
+
+        # import sound
+        self.weapon_attack_sound = pygame.mixer.Sound('../audio/sword.wav')
+        self.weapon_attack_sound.set_volume(0.2)
 
 
     def import_player_assets(self):
@@ -89,6 +93,7 @@ class PLayer(Entity):
                 self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
                 self.create_attack()
+                self.weapon_attack_sound.play()
 
             # magic input
             if keys[pygame.K_LCTRL]:
@@ -187,6 +192,12 @@ class PLayer(Entity):
         spell_damage = magic_data[self.magic]['strength']
         return  base_damage + spell_damage
 
+    def get_value_by_index(self, index):
+        return list(self.stats.values())[index]
+
+    def get_cost_by_index(self, index):
+        return list(self.upgrade_cost.values())[index]
+
     def energy_recovery(self):
         if self.energy < self.stats['energy']:
             self.energy += 0.01 * self.stats['magic']
@@ -198,5 +209,5 @@ class PLayer(Entity):
         self.cooldowns()
         self.get_status()
         self.animate()
-        self.move(self.speed)
+        self.move(self.stats['speed'])
         self.energy_recovery()

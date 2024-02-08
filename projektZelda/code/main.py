@@ -1,7 +1,6 @@
 import pygame, sys
 from settings import *
 from level import Level
-# from debug import debug
 
 class Game:
     def __init__(self):
@@ -14,7 +13,7 @@ class Game:
 
         # sounds
         main_sound = pygame.mixer.Sound('../audio/main.ogg')
-        main_sound.set_volume(0.5)
+        main_sound.set_volume(0.3)
         main_sound.play(loops = - 1)
 
         # outside look
@@ -34,7 +33,6 @@ class Game:
 
             self.screen.fill(WATER_COLOR)
             self.level.run()
-            #  debug('This called function is going to check some stuff later')
             pygame.display.update()
             self.clock.tick(FPS)
 

@@ -5,7 +5,6 @@ from player import PLayer
 from support import *
 from random import choice, randint
 from weapon import Weapon
-from debug import debug
 from ui import UI
 from enemy import Enemy
 from particles import AnimationPlayer

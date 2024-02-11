@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 from support import import_folder
 from settings import *
@@ -204,6 +206,11 @@ class PLayer(Entity):
         else:
             self.energy = self.stats['energy']
 
+    def player_death(self):
+        if self.health == 0:
+            pygame.quit()
+            sys.exit()
+
     def update(self):
         self.input()
         self.cooldowns()
@@ -211,3 +218,4 @@ class PLayer(Entity):
         self.animate()
         self.move(self.stats['speed'])
         self.energy_recovery()
+        self.player_death()

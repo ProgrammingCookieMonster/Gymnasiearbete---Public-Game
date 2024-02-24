@@ -1,3 +1,4 @@
+import asyncio
 import pygame, sys
 from settings import *
 from level import Level
@@ -21,7 +22,7 @@ class Game:
         game_icon = pygame.image.load("../graphics/runeblade_test_icon.png")  # Setting custom icon to the game window
         pygame.display.set_icon(game_icon)
 
-    def run(self):
+    async def run(self):
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -35,7 +36,8 @@ class Game:
             self.level.run()
             pygame.display.update()
             self.clock.tick(FPS)
+            await asyncio.sleep(0)
 
 if __name__ == '__main__':
     game = Game()
-    game.run()
+    asyncio.run( game.run())
